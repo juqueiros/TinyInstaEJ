@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<title>TinyInsta</title>
+	<!-- JQuery -->
+	<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<!-- FontAwesome -->
+	<script src="https://kit.fontawesome.com/8c5c1f4d11.js" crossorigin="anonymous"></script>
+	<!-- Google fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<style type="text/css">
+		body {
+  			font-family: 'Montserrat', sans-serif !important;
+		}
+	</style>
+</head>
+<body>
+
+	<header>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand"><img src="resources/logo.png" alt="TinyInsta" width=100></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link font-weight-bold" id="lb_feed" href="#" onclick="navbar_feed()">Fil d'actualités</a>
+					</li>
+					<li class="nav-item active">
+						<a class="nav-link" id="lb_own" href="#" onclick="navbar_own()">Publications</a>
+					</li>
+					<li class="nav-item dropdown active">
+						<a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Compte
+						</a>
+						<div class="dropdown-menu" aria-labelledby="accountDropdown">
+							<a class="dropdown-item" href="" data-toggle="modal" data-target="#postModal">Ajouter photo</a>
+							<a class="dropdown-item" href="" data-toggle="modal" data-target="#accountModal" onclick="navbar_account()">Paramètres</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="" data-toggle="modal" onclick="navbar_changeUser()">Déconnexion</a>
+						</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle d-none" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Administration
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<!-- JS -->
+							<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+						</div>
+					</li>
+				</ul>
+				<div class="form-inline my-2 my-lg-0">
+					<input class="form-control mr-sm-2" id="searchbar" type="search" placeholder="Rechercher @utilisateur" autocomplete="off" aria-label="Search" onkeyup="navbar_validUser()"
+					onkeydown="navbar_validUser_press()">
+					<button type="button" id="searchbarBtn" class="btn btn-outline-success my-2 my-sm-0" data-toggle="modal" data-target="#userModal" onclick="navbar_searchUser()" disabled><i class="fas fa-search"></i></button>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<br/>
+	<p style="margin-left: 30px;">Connecté en tant que <a id=connectedAs>...</a></p>
+
+	<div class="container w-50" id="root"></div>
+
+	
+	<!-- User modal -->
+	<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="userModalLabel"></h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<div id="userModalDiv"></div>
+	      	<br/> <br/>
+	      	<div id="userSubButton"></div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+
+	<!-- Account -->
+	<div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="myAccountModalLabel"></h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<div> Mes abonnements : 
+	      		<ul id="myAccountFollowings"></ul>
+	      	</div>
+	      </div>
+	      <div class="modal-footer d-flex justify-content-between">
+	      	<button type="button" class="btn btn-outline-danger" data-dismiss="modal" onclick="accountDelete()">Supprimer mon compte <i class="fas fa-user-slash"></i></button>
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- First connection -->
+	<div class="modal fade" id="firstModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Connexion</h5>
+	      </div>
+	      <div class="modal-body">
+	      	<p>Vous devez vous connecter à un compte pour accéder à l'application TinyInsta</p>
+			<input class="form-control mr-sm-2" id="userFirstConnectSearchbar" type="search" placeholder="identifiant (ex: mdupont)" autocomplete="off" aria-label="Search">
+			<br/><br/>
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseNewUser" aria-expanded="false" aria-controls="collapseExample">S'inscrire <i class="fas fa-arrow-down"></i></button>
+			<div class="collapse" id="collapseNewUser">
+			  <div class="card card-body">
+			  	<label>Nom d'utilisateur</label>
+			    <input class="form-control mr-sm-2" id="tfNewUserName" type="text" placeholder="Jean MARTIN" autocomplete="off">
+			    <label>Identifiant</label>
+			    <input class="form-control mr-sm-2" id="tfNewUserAt" type="text" placeholder="jmartin" autocomplete="off" onkeydown="newuser_validAt_press()" onkeyup="newuser_validAt()">
+			    <div id="tfNewUserAtDesc" class="text-danger"></div>
+			    <hr/>
+			    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnCreateUser" onclick="createUser()">Créer <i class="fas fa-sign-in-alt"></i></button>
+			  </div>
+			</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="connectUserAtInput('userFirstConnectSearchbar')">Connexion <i class="fas fa-sign-in-alt"></i></button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- Add post-->
+	<div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title"><i class="far fa-images"></i> Ajouter une image </h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="form-group">
+	            <label  class="col-form-label">URL de la photo</label>
+	            <input type="text" class="form-control" id="addPostPhoto" placeholder="http://">
+	            <label  class="col-form-label">Description</label>
+	            <input type="text" class="form-control" id="addPostDesc">
+	            <label  class="col-form-label">Lieu</label>
+	            <input type="text" class="form-control" id="addPostLieu">
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="publishContent()">Publier</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- post addes cuccessfully-->
+	<div class="modal fade" id="postSuccessModal" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title"><i class="fas fa-check"></i> Image publiée avec succès</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- Bootstrap -->
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+	<script type="text/javascript" src="js/refresh.js"></script>
+	<script type="text/javascript" src="js/user.js"></script>
+	<script type="text/javascript" src="js/searchbar.js"></script>
+	<script type="text/javascript" src="js/connectUser.js"></script>
+	<script type="text/javascript" src="js/navbar.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+
+	<script type="text/javascript">
+    $('#firstModal').on('hidden.bs.modal', function () {
+    	refresh()
+	});
+	main_splash()
+	</script>
+
+</body>
+</html>
